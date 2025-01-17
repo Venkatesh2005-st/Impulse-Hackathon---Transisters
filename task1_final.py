@@ -12,6 +12,7 @@ class_folders = [
     "Video_detected_Seizures_with_no_visual_change_over_EEG"
 ]
 
+#output directory
 output_dir = "C:\\college_stuff\\events\\impulse\\Impulse\\EEG_Data\\Train_data\\output_plots"
 os.makedirs(output_dir, exist_ok=True)
 
