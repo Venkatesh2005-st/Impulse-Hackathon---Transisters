@@ -43,14 +43,15 @@ for class_folder in class_folders:
             continue
 
         # Load the first CSV file (or all if needed)
-        file_path = os.path.join(output_dir, csv_files[0])
-        df = pd.read_csv(file_path)
+        for csv_file in csv_files:
+            file_path = os.path.join(output_dir, csv_file)
+            df = pd.read_csv(file_path)
 
-        if output == "fourier_outputs":
-            df["class"] = class_folder  # Add class label
-            fourier_df = df
-        else:  # "metrics_output"
-            metrics_df = df[["Zero_Crossing_Rate"]]  # Only keep needed column
+            if output == "fourier_outputs":
+                df["class"] = class_folder  # Add class label
+                fourier_df = df
+            else:  # "metrics_output"
+                metrics_df = df[["Zero_Crossing_Rate"]]  # Only keep needed column
 
     # Merge Fourier and Metrics data
     if fourier_df is not None and metrics_df is not None:
@@ -64,6 +65,8 @@ if "class" not in train_set_df.columns:
     raise ValueError("Class column missing in the dataset!")
 
 
+
+train_set_df.to_csv('C:\\college_stuff\\events\\impulse\\task6.1\\train_set_df.csv', index=False)
 
 # Prepare data for training
 X = train_set_df.drop(columns=["class"])
