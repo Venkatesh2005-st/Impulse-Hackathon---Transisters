@@ -14,19 +14,19 @@ class_folders = [
 ]
 
 #output directory
-output_dir = "C:\\college_stuff\\events\\impulse\\task6.1\\metrics_output"
+output_dir = "C:\\college_stuff\\events\\impulse\\task6.1\\outputs"
 os.makedirs(output_dir, exist_ok=True)
 
 #function to compute time domain metrics for EEG data
 def compute_metrics(eeg_data):
     metrics = []
     for channel_idx, channel_data in enumerate(eeg_data):
-        mean_val = np.mean(channel_data)
+        mean_val = np.nan_to_num(np.mean(channel_data), nan=0.0)
         zero_crossings = np.sum(np.diff(np.sign(channel_data)) != 0)
-        range_val = np.ptp(channel_data)
-        energy = np.sum(channel_data ** 2)
-        rms = np.sqrt(np.mean(channel_data ** 2))
-        variance = np.var(channel_data)
+        range_val = np.nan_to_num(np.ptp(channel_data), nan=0.0)
+        energy = np.nan_to_num(np.sum(channel_data ** 2), nan=0.0)
+        rms = np.nan_to_num(np.sqrt(np.mean(channel_data ** 2)), nan=0.0)
+        variance = np.nan_to_num(np.var(channel_data), nan=0.0)
 
         metrics.append({
             "Channel": channel_idx + 1,
@@ -37,6 +37,7 @@ def compute_metrics(eeg_data):
             "RMS": rms,
             "Variance": variance
         })
+
     return metrics
 
 
@@ -71,11 +72,13 @@ for class_folder in class_folders:
     # creating an output subdirectory for the class
     class_output_dir = os.path.join(output_dir, class_folder)
     os.makedirs(class_output_dir, exist_ok=True)
+    metric_output_dir = os.path.join(class_output_dir , "metrics_output")
+    os.makedirs(metric_output_dir, exist_ok=True)
 
     #selecting the first file
     for selected_file in npy_files:
         file_path = os.path.join(class_path, selected_file)
         #plotting the signals and computing metrics for the selected file
-        save_metrics(file_path, class_output_dir)
+        save_metrics(file_path, metric_output_dir)
 
 print("Plots and metrics have been generated and saved in the output directory.")
