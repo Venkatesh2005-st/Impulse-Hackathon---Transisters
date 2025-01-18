@@ -109,3 +109,4 @@ for class_folder in class_folders:
     plot_signals(file_path, class_output_dir, class_folder)
 
 print("Plots and metrics have been generated and saved in the output directory.")
+
