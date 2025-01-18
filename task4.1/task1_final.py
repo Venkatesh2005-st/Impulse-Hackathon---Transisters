@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 #base directory containing class folders
 base_dir = "C:\\college_stuff\\events\\impulse\\Impulse\\EEG_Data\\Train_data"
@@ -13,7 +14,7 @@ class_folders = [
 ]
 
 #output directory
-output_dir = "C:\\college_stuff\\events\\impulse\\Impulse\\EEG_Data\\Train_data\\output_plots"
+output_dir = "C:\\college_stuff\\events\\impulse\\task4.1\\output_plots"
 os.makedirs(output_dir, exist_ok=True)
 
 #function to compute time domain metrics for EEG data
@@ -60,6 +61,13 @@ def plot_signals(file_path, output_dir, class_folder):
     #Saving metrics
     metrics_file_path = os.path.join(output_dir, f"{file_name}_metrics.txt")
     save_metrics(metrics, metrics_file_path)
+    #print(f"Metrics saved to: {metrics_file_path}")
+
+    metrics_df = pd.DataFrame(metrics)
+
+    # Save metrics to a CSV file
+    metrics_file_path = os.path.join(output_dir, f"{file_name}_metrics.csv")
+    metrics_df.to_csv(metrics_file_path, index=False)
     print(f"Metrics saved to: {metrics_file_path}")
 
     #plotting individual channel signals
