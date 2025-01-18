@@ -119,6 +119,8 @@ for class_folder in class_folders:
     os.makedirs(fourier_output_dir, exist_ok=True)
     wavelet_output_dir = os.path.join(class_output_dir, "wavelet_decompositions")
     os.makedirs(wavelet_output_dir, exist_ok=True)
+    spectrogram_output_dir = os.path.join(class_output_dir, "spectrograms")
+    os.makedirs(spectrogram_output_dir, exist_ok=True)
 
     coeffs = wavelet_decomposition(signal, wavelet, 4)
 
@@ -141,7 +143,7 @@ for class_folder in class_folders:
         plt.xlabel('Time [sec]')
         plt.title(f'Spectrogram - {class_folder} (Channel {channel_idx})')
         plt.colorbar(label='Intensity')
-        plt.savefig(os.path.join(class_output_dir, f"{selected_file}_channel_{channel_idx + 1}.png"))
+        plt.savefig(os.path.join(spectrogram_output_dir, f"{selected_file}_channel_{channel_idx + 1}.png"))
         plt.close()
 
     print(f"saved output to {class_output_dir}")
