@@ -2,6 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.fft import fft, fftfreq
+import pywt
 
 #base directory containing class folders
 base_dir = "C:\\college_stuff\\events\\impulse\\Impulse\\EEG_Data\\Train_data"
@@ -38,8 +39,27 @@ def plot_fourier(signal, sampling_rate, class_folder, file_name, class_output_di
         plt.close()
 
 
-sampling_rate = 500
+# Perform 4-level Wavelet Decomposition for each channel
+def wavelet_decomposition(signal, wavelet='db4', level=4):
+    coeffs_multichannel = [pywt.wavedec(signal[channel], wavelet, level=level) for channel in range(signal.shape[0])]
+    return coeffs_multichannel  # Returns a list of coefficients for each channel
 
+
+# Plot coefficients for all channels
+def plot_wavelet_coeffs(coeffs_multichannel):
+    num_channels = len(coeffs_multichannel)
+    for channel_idx, coeffs in enumerate(coeffs_multichannel):
+        plt.figure(figsize=(12, 8))
+        for i, coeff in enumerate(coeffs):
+            plt.subplot(len(coeffs), 1, i + 1)
+            plt.plot(coeff)
+            plt.title(f"Channel {channel_idx + 1} - Level {i} {'Approximation' if i == 0 else 'Detail'} Coefficients")
+        plt.tight_layout()
+        plt.show()
+
+
+sampling_rate = 500
+wavelet = 'db4'
 
 #processing the files in each class folder
 for class_folder in class_folders:
@@ -61,4 +81,5 @@ for class_folder in class_folders:
     os.makedirs(class_output_dir, exist_ok=True)
 
     plot_fourier(signal, sampling_rate, class_folder, selected_file, class_output_dir)
+    plot_wavelet_coeffs(wavelet_decomposition(signal, wavelet, 4))
     print(f"saved output to {class_output_dir}")
