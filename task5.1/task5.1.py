@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.fft import fft, fftfreq
 import pywt
+from scipy.signal import spectrogram
 
 #base directory containing class folders
 base_dir = "C:\\college_stuff\\events\\impulse\\Impulse\\EEG_Data\\Train_data"
@@ -131,5 +132,16 @@ for class_folder in class_folders:
         f.write("Channel\tMost Similar Coefficient Level\tCorrelations\n")
         for ch in range(len(most_similar_level)):
             f.write(f"{ch}\t{most_similar_level[ch]}\t{correlations[ch]}\n")
+
+    for channel_idx in range(signal.shape[0]):
+        f, t, Sxx = spectrogram(signal[channel_idx, :], sampling_rate)  # Assuming a sampling rate of 256 Hz
+        plt.figure(figsize=(10, 5))
+        plt.pcolormesh(t, f, Sxx, shading='gouraud')
+        plt.ylabel('Frequency [Hz]')
+        plt.xlabel('Time [sec]')
+        plt.title(f'Spectrogram - {class_folder} (Channel {channel_idx})')
+        plt.colorbar(label='Intensity')
+        plt.savefig(os.path.join(class_output_dir, f"{selected_file}_channel_{channel_idx + 1}.png"))
+        plt.close()
 
     print(f"saved output to {class_output_dir}")
