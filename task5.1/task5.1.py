@@ -61,10 +61,35 @@ def plot_wavelet_coeffs(coeffs_multichannel, class_folder, selected_file, wavele
 
 # Find the coefficient most similar to the original signal (e.g., using correlation)
 def find_most_similar_coeff(signal, coeffs):
-    correlations = [np.corrcoef(signal, coeff[:len(signal)])[0, 1] for coeff in coeffs]
-    most_similar_level = np.argmax(correlations)
-    return most_similar_level, correlations
+    """
+    Find the most similar wavelet coefficient to the original signal for all channels.
 
+    Parameters:
+    - signal: The original signal (2D array with shape (channels, time)).
+    - coeffs: List of wavelet coefficients (list of 2D arrays per channel).
+
+    Returns:
+    - most_similar_levels: List of levels with the highest correlation for each channel.
+    - correlations: List of correlation values for each level per channel.
+    """
+    num_channels = signal.shape[0]
+    signal_length = signal.shape[1]
+
+    most_similar_levels = []
+    correlations_per_channel = []
+
+    for ch in range(num_channels):
+        correlations = []
+        for coeff in coeffs[ch]:
+            coeff_resized = coeff[:signal_length] if len(coeff) >= signal_length else np.pad(coeff, (
+                0, signal_length - len(coeff)), mode='constant')
+            correlation = np.corrcoef(signal[ch], coeff_resized)[0, 1]  # Compute correlation
+            correlations.append(correlation)
+
+        most_similar_levels.append(np.argmax(correlations))
+        correlations_per_channel.append(correlations)
+
+    return most_similar_levels, correlations_per_channel
 
 
 sampling_rate = 500
@@ -99,6 +124,12 @@ for class_folder in class_folders:
     plot_fourier(signal, sampling_rate, class_folder, file_name, fourier_output_dir)
     plot_wavelet_coeffs(coeffs, class_folder, file_name, wavelet_output_dir)
     most_similar_level, correlations = find_most_similar_coeff(signal, coeffs)
-    print(f"Most similar coefficient level: {most_similar_level}")
-    print(f"Correlations: {correlations}")
+
+    output_file = os.path.join(wavelet_output_dir, f"wavelet_similarity_{class_folder}.txt")
+
+    with open(output_file, "w") as f:
+        f.write("Channel\tMost Similar Coefficient Level\tCorrelations\n")
+        for ch in range(len(most_similar_level)):
+            f.write(f"{ch}\t{most_similar_level[ch]}\t{correlations[ch]}\n")
+
     print(f"saved output to {class_output_dir}")
